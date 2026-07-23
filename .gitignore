@@ -149,6 +149,8 @@ activemq-data/
 
 # Environments
 .env
+.venv
+last-run.txt
 .envrc
 .venv
 env/
