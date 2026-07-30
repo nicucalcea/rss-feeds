@@ -1,8 +1,9 @@
 """RSS source: GIJN Jobs Board."""
 
 import xml.etree.ElementTree as ET
-import urllib.request
 from email.utils import parsedate_to_datetime
+
+from curl_cffi import requests
 
 NAME = "gijn-jobs"
 TITLE = "GIJN Jobs Board"
@@ -14,23 +15,17 @@ _FEED_URL = "https://gijn.org/?feed=rss2&cat=23037"
 
 def get_items():
     """Fetch the native WordPress category feed and yield job items."""
-    req = urllib.request.Request(
+    resp = requests.get(
         _FEED_URL,
+        impersonate="chrome145",
         headers={
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/145.0.0.0 Safari/537.36"
-            ),
             "Accept": "application/rss+xml,application/xml;q=0.9,*/*;q=0.8",
         },
+        timeout=30,
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        raw = resp.read()
+    resp.raise_for_status()
 
-    root = ET.fromstring(raw)
-    # RSS 2.0: /rss/channel/item
-    ns = {"dc": "http://purl.org/dc/elements/1.1/"}
+    root = ET.fromstring(resp.content)
 
     for item in root.findall("./channel/item"):
         link_el = item.find("link")
