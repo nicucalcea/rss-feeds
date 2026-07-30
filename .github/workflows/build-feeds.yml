@@ -2,7 +2,6 @@ name: Build RSS Feeds
 
 on:
   schedule:
-    # Every 6 hours
     - cron: "0 */6 * * *"
   push:
     branches: [main]
@@ -31,21 +30,22 @@ jobs:
         uses: astral-sh/setup-uv@v5
 
       - name: Debug Python/TLS
-        run: uv run python -c "
-import ssl, sys, urllib.request
-print(f'Python: {sys.version}')
-print(f'SSL: {ssl.OPENSSL_VERSION}')
-for url in ['https://gijn.org/jobs/', 'https://gijn.org/?feed=rss2&cat=23037']:
-    try:
-        req = urllib.request.Request(url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml',
-        })
-        resp = urllib.request.urlopen(req, timeout=15)
-        print(f'OK {url}: {resp.status}, {len(resp.read())} bytes')
-    except Exception as e:
-        print(f'FAIL {url}: {e}')
-"
+        run: |
+          uv run python -c "
+          import ssl, sys, urllib.request
+          print(f'Python: {sys.version}')
+          print(f'SSL: {ssl.OPENSSL_VERSION}')
+          for url in ['https://gijn.org/jobs/', 'https://gijn.org/?feed=rss2&cat=23037']:
+              try:
+                  req = urllib.request.Request(url, headers={
+                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+                      'Accept': 'text/html,application/xhtml+xml',
+                  })
+                  resp = urllib.request.urlopen(req, timeout=15)
+                  print(f'OK {url}: {resp.status}, {len(resp.read())} bytes')
+              except Exception as e:
+                  print(f'FAIL {url}: {e}')
+          "
 
       - name: Run feed builder
         run: uv run python runner.py
