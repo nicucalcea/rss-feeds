@@ -3,6 +3,7 @@
 import xml.etree.ElementTree as ET
 from email.utils import parsedate_to_datetime
 
+# curl_cffi for browser TLS impersonation to bypass Cloudflare
 from curl_cffi import requests
 
 NAME = "gijn-jobs"
@@ -18,9 +19,6 @@ def get_items():
     resp = requests.get(
         _FEED_URL,
         impersonate="chrome145",
-        headers={
-            "Accept": "application/rss+xml,application/xml;q=0.9,*/*;q=0.8",
-        },
         timeout=30,
     )
     resp.raise_for_status()
