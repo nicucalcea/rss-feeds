@@ -1,10 +1,8 @@
 """RSS source: GIJN Jobs Board."""
 
 import xml.etree.ElementTree as ET
+import urllib.request
 from email.utils import parsedate_to_datetime
-
-# curl_cffi for browser TLS impersonation to bypass Cloudflare
-from curl_cffi import requests
 
 NAME = "gijn-jobs"
 TITLE = "GIJN Jobs Board"
@@ -16,14 +14,22 @@ _FEED_URL = "https://gijn.org/?feed=rss2&cat=23037"
 
 def get_items():
     """Fetch the native WordPress category feed and yield job items."""
-    resp = requests.get(
+    req = urllib.request.Request(
         _FEED_URL,
-        impersonate="chrome145",
-        timeout=30,
+        headers={
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/145.0.0.0 Safari/537.36"
+            ),
+            "Accept": "application/rss+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
     )
-    resp.raise_for_status()
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        raw = resp.read()
 
-    root = ET.fromstring(resp.content)
+    root = ET.fromstring(raw)
 
     for item in root.findall("./channel/item"):
         link_el = item.find("link")
@@ -41,7 +47,6 @@ def get_items():
         if not link:
             continue
 
-        # Convert RFC 2822 to ISO-8601
         published_iso = ""
         if pubdate:
             try:

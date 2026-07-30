@@ -2,6 +2,4 @@
 name = "rss-feeds"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = [
-    "curl-cffi>=0.15.0",
-]
+dependencies = []
