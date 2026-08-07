@@ -8,6 +8,7 @@ self-contained Python file under [`sources/`](sources/).
 ## Feeds
 
 - [Texty.org.ua (English)](https://nicucalcea.github.io/rss-feeds/texty-org-ua.xml)
+- [UNDP Procurement Notices — Moldova](https://nicucalcea.github.io/rss-feeds/undp-moldova-procurement.xml)
 
 ## Usage
 
